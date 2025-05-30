@@ -21,8 +21,8 @@ const CACHE_FILE = path.join(CACHE_DIR, "repo-cache.json")
 // Configuração da API do GitHub
 const GITHUB_API = "https://api.github.com"
 const GITHUB_TOKEN = process.env.GH_TOKEN
-const GITHUB_USERNAME = process.env.GITHUB_REPOSITORY?.split("/")[0] || "SEU_USUARIO"
-const CURRENT_REPO_NAME = process.env.GITHUB_REPOSITORY?.split("/")[1] || "octomind"
+const GITHUB_USERNAME = process.env.GITHUB_REPOSITORY?.split("/")[0] || "meuphilim"
+const CURRENT_REPO_NAME = process.env.GITHUB_REPOSITORY?.split("/")[1] || "OctoMind"
 
 // Headers para requisições à API do GitHub
 const headers = {

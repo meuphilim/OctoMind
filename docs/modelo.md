@@ -76,7 +76,7 @@ Se você tem interesse em contribuir para este projeto:
 [⬅️ Voltar ao Portfólio Principal](../README.md)
 \`\`\`
 
-```plaintext file="LICENSE"
+\`\`\`plaintext file="LICENSE"
 MIT License
 
 Copyright (c) 2024 SEU_USUARIO

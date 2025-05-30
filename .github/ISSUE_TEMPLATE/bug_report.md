@@ -3,7 +3,7 @@ name: 🐞 Relatório de Bug
 about: Crie um relatório para nos ajudar a melhorar o OctoMind
 title: '[BUG] - Breve descrição do bug'
 labels: bug, needs-triage
-assignees: SEU_USUARIO
+assignees: meuphilim
 ---
 
 **Descreva o Bug**

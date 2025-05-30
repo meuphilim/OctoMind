@@ -3,7 +3,7 @@ name: ✨ Solicitação de Funcionalidade
 about: Sugira uma ideia para este projeto
 title: '[FEATURE] - Breve descrição da funcionalidade'
 labels: enhancement, needs-discussion
-assignees: SEU_USUARIO
+assignees: meuphilim
 ---
 
 **Sua solicitação de funcionalidade está relacionada a um problema? Por favor, descreva.**

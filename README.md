@@ -1,13 +1,13 @@
 # OctoMind: Portfólio GitHub Dinâmico
 
-[![Status da Atualização](https://img.shields.io/github/actions/workflow/status/SEU_USUARIO/octomind/update.yml?branch=main&label=Atualização%20Automática&style=for-the-badge)](https://github.com/SEU_USUARIO/octomind/actions/workflows/update.yml)
+[![Status da Atualização](https://img.shields.io/github/actions/workflow/status/meuphilim/OctoMind/update.yml?branch=main&label=Atualização%20Automática&style=for-the-badge)](https://github.com/meuphilim/OctoMind/actions/workflows/update.yml)
 ![Repositórios](https://img.shields.io/badge/Repositórios-{{ REPO_COUNT }}-blue?style=for-the-badge)
 ![Linguagens](https://img.shields.io/badge/Linguagens-{{ LANGUAGE_COUNT }}-orange?style=for-the-badge)
-[![GitHub Profile](https://img.shields.io/badge/GitHub-SEU_USUARIO-lightgrey?style=for-the-badge&logo=github)](https://github.com/SEU_USUARIO)
+[![GitHub Profile](https://img.shields.io/badge/GitHub-meuphilim-lightgrey?style=for-the-badge&logo=github)](https://github.com/meuphilim)
 
 ## 👋 Sobre Mim
 
-Olá! Sou **@SEU_USUARIO**, um desenvolvedor entusiasta focado em desenvolvimento web e automação. Este portfólio é uma vitrine viva dos meus projetos e contribuições, mantido atualizado dinamicamente pela magia do GitHub Actions.
+Olá! Sou **@meuphilim**, um desenvolvedor entusiasta focado em desenvolvimento web e automação. Este portfólio é uma vitrine viva dos meus projetos e contribuições, mantido atualizado dinamicamente pela magia do GitHub Actions.
 
 ## 🚀 Meus Projetos
 
@@ -32,7 +32,7 @@ Este portfólio é automatizado através de:
 
 ## 📬 Contato
 
-- **GitHub**: [@SEU_USUARIO](https://github.com/SEU_USUARIO)
+- **GitHub**: [@meuphilim](https://github.com/meuphilim)
 - **LinkedIn**: [Seu LinkedIn]
 - **Email**: [Seu Email]
 
