@@ -1,0 +1,67 @@
+name: Atualizar Portfólio OctoMind
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'  # Todo domingo à meia-noite
+  workflow_dispatch:      # Execução manual
+  push:
+    branches: [ main ]
+    paths:
+      - 'scripts/**'      # Apenas quando os scripts são alterados
+      - 'package.json'    # Ou quando as dependências mudam
+      - '.github/workflows/update.yml'  # Ou quando o workflow muda
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  update-portfolio:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1  # Otimização: buscar apenas o último commit
+      
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: 📦 Install dependencies
+        run: npm ci
+      
+      - name: ⚙️ Configure Git
+        run: |
+          git config user.name "OctoMind Bot"
+          git config user.email "octomind-bot@users.noreply.github.com"
+      
+      - name: 🚀 Run update script
+        run: node scripts/update_catalog.js
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+      
+      - name: 🔍 Check for changes
+        id: check_changes
+        run: |
+          if [[ -n "$(git status --porcelain)" ]]; then
+            echo "changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "changes=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: 💾 Commit and push
+        if: steps.check_changes.outputs.changes == 'true'
+        run: |
+          git add .
+          git commit -m "🤖 OctoMind: Atualização automática do portfólio [$(date +'%Y-%m-%d')]"
+          git push
+      
+      - name: 📢 No changes detected
+        if: steps.check_changes.outputs.changes == 'false'
+        run: echo "Nenhuma alteração detectada. Pulando commit."
