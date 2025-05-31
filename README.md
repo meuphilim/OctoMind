@@ -223,8 +223,8 @@
 # OctoMind: Portfólio GitHub Dinâmico
 
 [![Status da Atualização](https://img.shields.io/github/actions/workflow/status/meuphilim/OctoMind/update.yml?branch=main&label=Atualização%20Automática&style=for-the-badge)](https://github.com/meuphilim/OctoMind/actions/workflows/update.yml)
-![Repositórios](https://img.shields.io/badge/Repositórios-5-blue?style=for-the-badge)
-![Linguagens](https://img.shields.io/badge/Linguagens-3-orange?style=for-the-badge)
+![Repositórios](https://img.shields.io/badge/Repositórios-{{ REPO_COUNT }}-blue?style=for-the-badge)
+![Linguagens](https://img.shields.io/badge/Linguagens-{{ LANGUAGE_COUNT }}-orange?style=for-the-badge)
 [![GitHub Profile](https://img.shields.io/badge/GitHub-meuphilim-lightgrey?style=for-the-badge&logo=github)](https://github.com/meuphilim)
 
 ## 👋 Sobre Mim
