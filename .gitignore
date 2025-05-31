@@ -4,7 +4,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Não versionar package-lock.json para evitar conflitos
+# Lock files - vamos gerenciar manualmente
 package-lock.json
 yarn.lock
 
@@ -40,3 +40,15 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
+
+# Next.js (não usado)
+.next/
+out/
+build/
+dist/
+
+# React/Next.js específicos (não usados)
+public/
+components/
+pages/
+styles/

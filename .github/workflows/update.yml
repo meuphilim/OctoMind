@@ -24,25 +24,25 @@ jobs:
       - name: 📥 Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1  # Otimização: buscar apenas o último commit
+          fetch-depth: 1
       
       - name: 🟢 Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
       
-      - name: 📦 Install dependencies
+      - name: 🧹 Clean install
         run: |
-          # Verificar se package-lock.json existe
-          if [ -f "package-lock.json" ]; then
-            echo "📋 Usando package-lock.json existente"
-            npm ci
-          else
-            echo "📦 Instalando dependências sem lock file"
-            npm install --save slugify --no-package-lock --force
-          fi
-          # Verificar se a instalação funcionou
-          npm list slugify || echo "⚠️ Slugify não encontrado, mas continuando..."
+          echo "🧹 Limpando instalações anteriores..."
+          rm -rf node_modules/
+          rm -f package-lock.json
+          rm -f yarn.lock
+          
+          echo "📦 Instalando apenas slugify..."
+          npm install slugify --save --no-package-lock --force
+          
+          echo "✅ Dependências instaladas:"
+          npm list --depth=0 || echo "Lista de dependências não disponível"
       
       - name: ⚙️ Configure Git
         run: |
