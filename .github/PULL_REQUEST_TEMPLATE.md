@@ -32,7 +32,3 @@ Por favor, descreva os testes que você executou para verificar suas mudanças. 
 - [ ] Testes unitários novos e existentes passam localmente com minhas mudanças
 - [ ] Quaisquer mudanças dependentes foram mescladas e publicadas em módulos downstream
 \`\`\`
-
-```plaintext file="CNAME"
-# Substitua pelo seu domínio personalizado, se tiver um.
-# Exemplo: portfolio.seuusuario.dev

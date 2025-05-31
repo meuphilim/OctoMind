@@ -35,3 +35,9 @@ desktop.ini
 # Arquivos temporários
 tmp/
 temp/
+
+# Next.js (não usado neste projeto)
+.next/
+out/
+build/
+dist/

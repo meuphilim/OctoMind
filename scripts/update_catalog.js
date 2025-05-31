@@ -6,7 +6,6 @@
 import fs from "fs/promises"
 import path from "path"
 import { fileURLToPath } from "url"
-import fetch from "node-fetch"
 import slugify from "slugify"
 
 // Configurações
@@ -27,6 +26,7 @@ const CURRENT_REPO_NAME = process.env.GITHUB_REPOSITORY?.split("/")[1] || "OctoM
 // Headers para requisições à API do GitHub
 const headers = {
   Accept: "application/vnd.github.v3+json",
+  "User-Agent": "OctoMind-Portfolio-Bot/2.1.0",
   ...(GITHUB_TOKEN && { Authorization: `Bearer ${GITHUB_TOKEN}` }),
 }
 
@@ -62,6 +62,12 @@ async function main() {
   try {
     console.log(`🚀 Iniciando OctoMind para @${GITHUB_USERNAME}...`)
 
+    // Verificar se o Node.js suporta fetch nativo
+    if (typeof fetch === "undefined") {
+      console.error("❌ Este script requer Node.js 18+ com fetch nativo")
+      process.exit(1)
+    }
+
     // Criar diretórios necessários
     await createDirectories()
 
@@ -79,6 +85,7 @@ async function main() {
     console.log("✅ OctoMind concluído com sucesso!")
   } catch (error) {
     console.error("❌ Erro:", error.message)
+    console.error("Stack trace:", error.stack)
     process.exit(1)
   }
 }
@@ -87,7 +94,13 @@ async function main() {
  * Cria os diretórios necessários
  */
 async function createDirectories() {
-  await Promise.all([fs.mkdir(DOCS_DIR, { recursive: true }), fs.mkdir(CACHE_DIR, { recursive: true })])
+  try {
+    await Promise.all([fs.mkdir(DOCS_DIR, { recursive: true }), fs.mkdir(CACHE_DIR, { recursive: true })])
+    console.log("📁 Diretórios criados com sucesso")
+  } catch (error) {
+    console.error("❌ Erro ao criar diretórios:", error.message)
+    throw error
+  }
 }
 
 /**
@@ -110,8 +123,12 @@ async function fetchRepositories() {
       const cacheStats = await fs.stat(CACHE_FILE)
       const cacheAge = Date.now() - cacheStats.mtimeMs
       useCache = cacheAge < 3600000 // 1 hora em milissegundos
+
+      if (useCache) {
+        console.log("📋 Cache encontrado e ainda válido")
+      }
     } catch (error) {
-      // Cache não existe ou não pode ser lido
+      console.log("📋 Cache não encontrado ou inválido, buscando dados frescos...")
     }
 
     // Usar cache se disponível e recente
@@ -126,6 +143,7 @@ async function fetchRepositories() {
 
     // Salvar no cache
     await fs.writeFile(CACHE_FILE, JSON.stringify(repos, null, 2))
+    console.log("💾 Dados salvos no cache")
 
     return repos
   } catch (error) {
@@ -137,6 +155,7 @@ async function fetchRepositories() {
       console.log("🔄 Usando cache de backup devido a erro na API.")
       return JSON.parse(cacheData)
     } catch (cacheError) {
+      console.error("❌ Não foi possível usar cache de backup:", cacheError.message)
       // Se não houver cache, propaga o erro original
       throw error
     }
@@ -161,20 +180,29 @@ async function fetchAllRepositories() {
 
       // Verificar limites de rate da API
       const rateLimit = response.headers.get("x-ratelimit-remaining")
-      if (rateLimit && Number.parseInt(rateLimit) < 5) {
-        console.warn(`⚠️ Atenção: Apenas ${rateLimit} requisições restantes para a API do GitHub.`)
+      const rateLimitReset = response.headers.get("x-ratelimit-reset")
+
+      if (rateLimit) {
+        console.log(`📊 Rate limit restante: ${rateLimit}`)
+        if (Number.parseInt(rateLimit) < 5) {
+          const resetTime = new Date(Number.parseInt(rateLimitReset) * 1000)
+          console.warn(`⚠️ Atenção: Apenas ${rateLimit} requisições restantes. Reset em: ${resetTime.toLocaleString()}`)
+        }
       }
 
       if (!response.ok) {
-        throw new Error(`Falha ao buscar repositórios: ${response.status} ${response.statusText}`)
+        const errorText = await response.text()
+        throw new Error(`Falha ao buscar repositórios: ${response.status} ${response.statusText} - ${errorText}`)
       }
 
       const repos = await response.json()
 
       if (repos.length === 0) {
         hasMorePages = false
+        console.log("📄 Nenhum repositório adicional encontrado")
       } else {
         allRepos = [...allRepos, ...repos]
+        console.log(`📚 Encontrados ${repos.length} repositórios na página ${page}`)
         page++
 
         // Verificar se provavelmente há mais páginas
@@ -187,6 +215,7 @@ async function fetchAllRepositories() {
     }
   }
 
+  console.log(`📊 Total de repositórios encontrados: ${allRepos.length}`)
   return allRepos
 }
 
@@ -195,6 +224,8 @@ async function fetchAllRepositories() {
  */
 async function updateReadme(repos) {
   try {
+    console.log("📝 Atualizando README.md...")
+
     let readmeContent = await fs.readFile(README_PATH, "utf8")
     const oldContent = readmeContent
 
@@ -210,13 +241,13 @@ async function updateReadme(repos) {
     const languageCount = languages.size
 
     readmeContent = readmeContent
-      .replace(/{{ REPO_COUNT }}/g, repoCount.toString())
-      .replace(/{{ LANGUAGE_COUNT }}/g, languageCount.toString())
+      .replace(/\{\{ REPO_COUNT \}\}/g, repoCount.toString())
+      .replace(/\{\{ LANGUAGE_COUNT \}\}/g, languageCount.toString())
 
     // Só escrever se houver mudanças
     if (readmeContent !== oldContent) {
       await fs.writeFile(README_PATH, readmeContent)
-      console.log("📝 README.md atualizado.")
+      console.log("✅ README.md atualizado com sucesso.")
     } else {
       console.log("📝 README.md sem alterações.")
     }
@@ -279,10 +310,12 @@ function sanitizeMarkdown(text) {
  */
 async function generateDocumentation(repos) {
   try {
+    console.log("📋 Gerando documentação...")
+
     const modelContent = await fs.readFile(MODEL_PATH, "utf8")
 
     // Processar repositórios em paralelo para melhor performance
-    await Promise.all(
+    const results = await Promise.allSettled(
       repos.map(async (repo) => {
         const repoSlug = slugify(repo.name, { lower: true, strict: true })
         const docPath = path.join(DOCS_DIR, `${repoSlug}.md`)
@@ -296,22 +329,25 @@ async function generateDocumentation(repos) {
         }
 
         let docContent = modelContent
-          .replace(/{{ PROJECT_NAME }}/g, sanitizeMarkdown(repo.name))
+          .replace(/\{\{ PROJECT_NAME \}\}/g, sanitizeMarkdown(repo.name))
           .replace(
-            /{{ PROJECT_DESCRIPTION }}/g,
+            /\{\{ PROJECT_DESCRIPTION \}\}/g,
             repo.description ? sanitizeMarkdown(repo.description) : "*Sem descrição disponível.*",
           )
-          .replace(/{{ PROJECT_LANGUAGE }}/g, repo.language ? sanitizeMarkdown(repo.language) : "*Não especificado*")
-          .replace(/{{ PROJECT_URL }}/g, repo.html_url)
           .replace(
-            /{{ PROJECT_TOPICS }}/g,
+            /\{\{ PROJECT_LANGUAGE \}\}/g,
+            repo.language ? sanitizeMarkdown(repo.language) : "*Não especificado*",
+          )
+          .replace(/\{\{ PROJECT_URL \}\}/g, repo.html_url)
+          .replace(
+            /\{\{ PROJECT_TOPICS \}\}/g,
             repo.topics && repo.topics.length > 0
               ? repo.topics.map((topic) => `\`${sanitizeMarkdown(topic)}\``).join(", ")
               : "*Nenhum tópico definido*",
           )
 
         docContent = docContent.replace(
-          /{{ PROJECT_DEMO_LINK_PLACEHOLDER }}/g,
+          /\{\{ PROJECT_DEMO_LINK_PLACEHOLDER \}\}/g,
           repo.homepage ? `- [🌐 Demo](${repo.homepage})` : "",
         )
 
@@ -319,11 +355,26 @@ async function generateDocumentation(repos) {
         if (docContent !== existingContent) {
           await fs.writeFile(docPath, docContent)
           console.log(`📄 Documentação atualizada para ${repo.name}`)
+          return { status: "updated", repo: repo.name }
+        } else {
+          return { status: "unchanged", repo: repo.name }
         }
       }),
     )
 
-    console.log("📋 Documentação gerada com sucesso.")
+    const successful = results.filter((r) => r.status === "fulfilled").length
+    const failed = results.filter((r) => r.status === "rejected").length
+
+    console.log(`✅ Documentação processada: ${successful} sucessos, ${failed} falhas`)
+
+    if (failed > 0) {
+      console.log("❌ Falhas na documentação:")
+      results.forEach((result, index) => {
+        if (result.status === "rejected") {
+          console.log(`  - ${repos[index].name}: ${result.reason.message}`)
+        }
+      })
+    }
   } catch (error) {
     console.error("❌ Erro ao gerar documentação:", error.message)
     throw error
