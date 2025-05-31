@@ -4,6 +4,10 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Não versionar package-lock.json para evitar conflitos
+package-lock.json
+yarn.lock
+
 # Cache
 .cache/
 *.cache

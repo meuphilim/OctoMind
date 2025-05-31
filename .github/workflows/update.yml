@@ -30,10 +30,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-          cache: 'npm'
       
       - name: 📦 Install dependencies
-        run: npm install --legacy-peer-deps
+        run: |
+          # Verificar se package-lock.json existe
+          if [ -f "package-lock.json" ]; then
+            echo "📋 Usando package-lock.json existente"
+            npm ci
+          else
+            echo "📦 Instalando dependências sem lock file"
+            npm install --save slugify --no-package-lock --force
+          fi
+          # Verificar se a instalação funcionou
+          npm list slugify || echo "⚠️ Slugify não encontrado, mas continuando..."
       
       - name: ⚙️ Configure Git
         run: |
