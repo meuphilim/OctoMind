@@ -258,43 +258,195 @@ async function updateReadme(repos) {
 }
 
 /**
- * Gera a tabela de repositórios
+ * Gera a seção de repositórios em formato de cards
  */
 function generateRepositoryTable(repos) {
   if (repos.length === 0) {
-    return "*Nenhum projeto encontrado.*"
+    return `
+<div align="center">
+  <h3>🔍 Nenhum projeto encontrado</h3>
+  <p><em>Os projetos aparecerão aqui assim que forem detectados pelo script.</em></p>
+</div>`
   }
 
-  const table = [
-    "| Projeto | Descrição | Linguagem | Última Atualização | Tópicos |",
-    "|:--------|:----------|:----------|:-------------------|:--------|",
-  ]
+  // Agrupar repositórios por linguagem para melhor organização
+  const reposByLanguage = repos.reduce((acc, repo) => {
+    const lang = repo.language || "Outros"
+    if (!acc[lang]) acc[lang] = []
+    acc[lang].push(repo)
+    return acc
+  }, {})
+
+  let content = `
+<div align="center">
+  <h3>📊 Estatísticas dos Projetos</h3>
+  <p>
+    <img src="https://img.shields.io/badge/Total_de_Projetos-${repos.length}-blue?style=for-the-badge" alt="Total de Projetos">
+    <img src="https://img.shields.io/badge/Linguagens-${Object.keys(reposByLanguage).length}-orange?style=for-the-badge" alt="Linguagens">
+  </p>
+</div>
+
+---
+`
+
+  // Gerar cards para cada repositório
+  content += `
+<div align="center">
+  <h3>🗂️ Projetos por Categoria</h3>
+</div>
+
+<table>
+  <tr>
+    <th width="50%">📋 Projeto</th>
+    <th width="25%">🛠️ Tecnologia</th>
+    <th width="25%">📅 Atualização</th>
+  </tr>`
 
   for (const repo of repos) {
-    // Sanitizar dados para evitar injeção de markdown
     const name = sanitizeMarkdown(repo.name)
-    const description = repo.description ? sanitizeMarkdown(repo.description) : "*Sem descrição*"
-
+    const description = repo.description ? sanitizeMarkdown(repo.description) : "*Sem descrição disponível*"
     const lang = repo.language || "N/A"
     const languageDisplay = `${languageEmojis[lang] || languageEmojis.default} ${sanitizeMarkdown(lang)}`
 
     // Formatar data no formato brasileiro
     const updatedAt = new Date(repo.updated_at).toLocaleDateString("pt-BR")
 
-    const topics =
-      repo.topics && repo.topics.length > 0
-        ? repo.topics.map((topic) => `\`${sanitizeMarkdown(topic)}\``).join(" ")
-        : "*Nenhum*"
-
+    // Criar slug para documentação
     const docFileName = `${slugify(name, { lower: true, strict: true })}.md`
-    const docLink = `[📄](./docs/${docFileName})`
 
-    table.push(
-      `| [${name}](${repo.html_url}) ${docLink} | ${description} | ${languageDisplay} | ${updatedAt} | ${topics} |`,
-    )
+    // Gerar badges para tópicos
+    const topicsBadges =
+      repo.topics && repo.topics.length > 0
+        ? repo.topics
+            .map(
+              (topic) =>
+                `<img src="https://img.shields.io/badge/${encodeURIComponent(topic)}-gray?style=flat-square" alt="${topic}">`,
+            )
+            .join(" ")
+        : ""
+
+    // Links adicionais
+    const demoLink = repo.homepage ? `<br><a href="${repo.homepage}">🌐 Demo</a>` : ""
+
+    content += `
+  <tr>
+    <td>
+      <div align="left">
+        <h4><a href="${repo.html_url}">${name}</a> <a href="./docs/${docFileName}">📄</a></h4>
+        <p><em>${description}</em></p>
+        ${topicsBadges ? `<p>${topicsBadges}</p>` : ""}
+        ${demoLink}
+      </div>
+    </td>
+    <td align="center">
+      <strong>${languageDisplay}</strong>
+    </td>
+    <td align="center">
+      <code>${updatedAt}</code>
+    </td>
+  </tr>`
   }
 
-  return table.join("\n")
+  content += `
+</table>
+
+---
+
+<div align="center">
+  <h3>📈 Linguagens Mais Utilizadas</h3>
+</div>
+
+<div align="center">
+`
+
+  // Gerar estatísticas de linguagens
+  const languageStats = Object.entries(reposByLanguage)
+    .sort(([, a], [, b]) => b.length - a.length)
+    .slice(0, 5) // Top 5 linguagens
+
+  for (const [language, repoList] of languageStats) {
+    const emoji = languageEmojis[language] || languageEmojis.default
+    const percentage = Math.round((repoList.length / repos.length) * 100)
+    content += `  <img src="https://img.shields.io/badge/${encodeURIComponent(language)}-${repoList.length}_projetos_(${percentage}%25)-${getLanguageColor(language)}?style=for-the-badge&logo=${getLanguageLogo(language)}" alt="${language}">
+`
+  }
+
+  content += `
+</div>
+
+---
+
+<div align="center">
+  <h3>🔗 Links Rápidos</h3>
+  <p>
+    <a href="#sobre-mim">👋 Sobre Mim</a> •
+    <a href="#como-funciona">⚙️ Como Funciona</a> •
+    <a href="#tecnologias">🛠️ Tecnologias</a> •
+    <a href="#contato">📬 Contato</a>
+  </p>
+</div>`
+
+  return content
+}
+
+/**
+ * Retorna a cor hexadecimal para uma linguagem
+ */
+function getLanguageColor(language) {
+  const colors = {
+    JavaScript: "F7DF1E",
+    TypeScript: "3178C6",
+    Python: "3776AB",
+    Java: "ED8B00",
+    "C#": "239120",
+    PHP: "777BB4",
+    Ruby: "CC342D",
+    Go: "00ADD8",
+    Rust: "000000",
+    Swift: "FA7343",
+    Kotlin: "0095D5",
+    HTML: "E34F26",
+    CSS: "1572B6",
+    Shell: "89E051",
+    "C++": "00599C",
+    C: "A8B9CC",
+    Dart: "0175C2",
+    Vue: "4FC08D",
+    React: "61DAFB",
+    Angular: "DD0031",
+    default: "6C757D",
+  }
+  return colors[language] || colors.default
+}
+
+/**
+ * Retorna o logo para uma linguagem
+ */
+function getLanguageLogo(language) {
+  const logos = {
+    JavaScript: "javascript",
+    TypeScript: "typescript",
+    Python: "python",
+    Java: "java",
+    "C#": "csharp",
+    PHP: "php",
+    Ruby: "ruby",
+    Go: "go",
+    Rust: "rust",
+    Swift: "swift",
+    Kotlin: "kotlin",
+    HTML: "html5",
+    CSS: "css3",
+    Shell: "gnubash",
+    "C++": "cplusplus",
+    C: "c",
+    Dart: "dart",
+    Vue: "vue.js",
+    React: "react",
+    Angular: "angular",
+    default: "code",
+  }
+  return logos[language] || logos.default
 }
 
 /**
