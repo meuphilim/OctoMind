@@ -1,8 +1,8 @@
 # OctoMind: Portfólio GitHub Dinâmico
 
 [![Status da Atualização](https://img.shields.io/github/actions/workflow/status/meuphilim/OctoMind/update.yml?branch=main&label=Atualização%20Automática&style=for-the-badge)](https://github.com/meuphilim/OctoMind/actions/workflows/update.yml)
-![Repositórios](https://img.shields.io/badge/Repositórios-{{ REPO_COUNT }}-blue?style=for-the-badge)
-![Linguagens](https://img.shields.io/badge/Linguagens-{{ LANGUAGE_COUNT }}-orange?style=for-the-badge)
+![Repositórios](https://img.shields.io/badge/Repositórios-5-blue?style=for-the-badge)
+![Linguagens](https://img.shields.io/badge/Linguagens-3-orange?style=for-the-badge)
 [![GitHub Profile](https://img.shields.io/badge/GitHub-meuphilim-lightgrey?style=for-the-badge&logo=github)](https://github.com/meuphilim)
 
 ## 👋 Sobre Mim
@@ -12,7 +12,13 @@ Olá! Sou **@meuphilim**, um desenvolvedor entusiasta focado em desenvolvimento 
 ## 🚀 Meus Projetos
 
 <!-- OCTOMIND_PROJECTS_START -->
-*Aguardando a primeira execução do script de atualização...*
+| Projeto | Descrição | Linguagem | Última Atualização | Tópicos |
+|:--------|:----------|:----------|:-------------------|:--------|
+| [meuphilim.github.io](https://github.com/meuphilim/meuphilim.github.io) [📄](./docs/meuphilimgithubio.md) | *Sem descrição* | 🟨 JavaScript | 29/05/2025 | *Nenhum* |
+| [PousadadoInacio](https://github.com/meuphilim/PousadadoInacio) [📄](./docs/pousadadoinacio.md) | *Sem descrição* | 🔷 TypeScript | 26/05/2025 | *Nenhum* |
+| [pousadas-aguas](https://github.com/meuphilim/pousadas-aguas) [📄](./docs/pousadas-aguas.md) | *Sem descrição* | 🔷 TypeScript | 25/05/2025 | *Nenhum* |
+| [PGSMS-Slots](https://github.com/meuphilim/PGSMS-Slots) [📄](./docs/pgsms-slots.md) | *Sem descrição* | 🌐 HTML | 07/04/2025 | *Nenhum* |
+| [UrbanGo_](https://github.com/meuphilim/UrbanGo_) [📄](./docs/urbango.md) | Gerenciamento de frota | 🔷 TypeScript | 03/03/2025 | *Nenhum* |
 <!-- OCTOMIND_PROJECTS_END -->
 
 ## ⚙️ Como Funciona
