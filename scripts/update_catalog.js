@@ -1,6 +1,6 @@
 /**
  * OctoMind - Script de Atualização de Catálogo
- * Versão: 2.2.0 (Aprimoramentos de Portfólio)
+ * Versão: 2.2.0 (Aprimoramentos de Portfólio - Correção de Duplicação)
  */
 
 import fs from "fs/promises"
@@ -13,7 +13,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT_DIR = path.join(__dirname, "..")
 const README_PATH = path.join(ROOT_DIR, "README.md")
 const DOCS_DIR = path.join(ROOT_DIR, "docs")
-const MODEL_PATH = path.join(DOCS_DIR, "modelo.md") // Certifique-se que este arquivo existe e contém o novo template
+const MODEL_PATH = path.join(DOCS_DIR, "modelo.md")
 const CACHE_DIR = path.join(ROOT_DIR, ".cache")
 const CACHE_FILE = path.join(CACHE_DIR, "repo-cache.json")
 
@@ -229,11 +229,12 @@ async function updateReadme(repos) {
     let readmeContent = await fs.readFile(README_PATH, "utf8")
     const oldContent = readmeContent
 
-    const projectsSection = generateProjectsSection(repos) // Renomeado para refletir o novo formato
+    // Chamar a função que gera o HTML dos cards
+    const projectsSectionHtml = generateProjectsSection(repos)
 
     readmeContent = readmeContent.replace(
       /[\s\S]*?/,
-      `\n${projectsSection}\n`,
+      `\n${projectsSectionHtml}\n`,
     )
 
     const repoCount = repos.length
@@ -437,7 +438,8 @@ function getLanguageLogo(language) {
  */
 function sanitizeMarkdown(text) {
   if (!text) return ""
-  return text.replace(/\|/g, "\\|").replace(/\[/g, "\\[").replace(/\]/g, "\\]")
+  // Escape markdown characters that could break inline HTML or markdown parsing
+  return text.replace(/\|/g, "\\|").replace(/\[/g, "\\[").replace(/\]/g, "\\]").replace(/\</g, "&lt;").replace(/\>/g, "&gt;");
 }
 
 /**
@@ -452,34 +454,79 @@ async function generateDocumentation(repos) {
         modelContent = await fs.readFile(MODEL_PATH, "utf8");
     } catch (readError) {
         console.warn(`⚠️ Aviso: O arquivo de modelo "${MODEL_PATH}" não foi encontrado. A documentação será gerada com um template padrão. Crie este arquivo para personalizar a documentação.`);
-        // Fallback para um template padrão se o modelo não existir
+        // Fallback para um template padrão se o modelo não existir, usando a estrutura do seu modelo.md atual
         modelContent = `
 # {{ PROJECT_NAME }}
 
-## Visão Geral
+---
+
+## 📋 Visão Geral
 
 {{ PROJECT_DESCRIPTION }}
 
-## Tecnologias Utilizadas
+---
 
-- **Linguagem Principal**: {{ PROJECT_LANGUAGE }}
-- **Tópicos**: {{ PROJECT_TOPICS }}
+## 🛠️ Tecnologias Utilizadas
 
-## Links
+**Linguagem Principal:** {{ PROJECT_LANGUAGE }}  
+**Tópicos/Skills:** {{ PROJECT_TOPICS }}
 
-- [🔗 Repositório no GitHub]({{ PROJECT_URL }})
+---
+
+## 🔗 Links
+
+- [📂 Repositório GitHub]({{ PROJECT_URL }})
 {{ PROJECT_DEMO_LINK_PLACEHOLDER }}
 
 ---
 
-### Adicione Mais Detalhes
+## 📝 Detalhes Técnicos e Aprendizados
 
-Para deixar esta documentação mais completa, você pode adicionar as seguintes seções manualmente:
+_Esta seção pode ser expandida com informações mais detalhadas sobre o projeto:_
 
-- **Funcionalidades Principais**: Liste as características mais importantes do projeto.
-- **Como Executar**: Instruções para configurar e rodar o projeto localmente.
-- **Screenshots/GIFs**: Adicione imagens para mostrar o projeto em ação.
-- **Desafios e Aprendizados**: Descreva os problemas que você enfrentou e o que aprendeu ao desenvolvê-lo.
+### 🎯 Objetivos do Projeto
+- _Descreva os principais objetivos e motivações para criar este projeto_
+- _Explique qual problema ele resolve ou que necessidade atende_
+
+### 🚧 Desafios Enfrentados
+- _Relate os principais desafios técnicos encontrados durante o desenvolvimento_
+- _Explique como esses desafios foram superados_
+
+### 🏗️ Arquitetura e Design
+- _Descreva as principais decisões de arquitetura_
+- _Explique a estrutura do projeto e organização do código_
+- _Mencione padrões de design utilizados_
+
+### 📚 Aprendizados
+- _Liste as principais tecnologias aprendidas ou aprimoradas_
+- _Descreva como este projeto contribuiu para seu crescimento profissional_
+- _Mencione boas práticas implementadas_
+
+### 🔮 Próximos Passos
+- _Liste melhorias planejadas para o futuro_
+- _Mencione funcionalidades que podem ser adicionadas_
+
+---
+
+### 📸 Screenshots e Demonstrações
+
+_Adicione aqui screenshots, GIFs ou diagramas que demonstrem o projeto em funcionamento:_
+
+---
+
+### 🤝 Como Contribuir
+
+Se você tem interesse em contribuir para este projeto:
+
+1. Faça um fork do repositório
+2. Crie uma branch para sua feature (\`git checkout -b feature/AmazingFeature\`)
+3. Commit suas mudanças (\`git commit -m 'Add some AmazingFeature'\`)
+4. Push para a branch (\`git push origin feature/AmazingFeature\`)
+5. Abra um Pull Request
+
+---
+
+[⬅️ Voltar ao Portfólio Principal](../README.md)
         `;
     }
 
@@ -517,7 +564,7 @@ Para deixar esta documentação mais completa, você pode adicionar as seguintes
 
         docContent = docContent.replace(
           /\{\{ PROJECT_DEMO_LINK_PLACEHOLDER \}\}/g,
-          repo.homepage ? `- [🌐 Demo ao Vivo](${repo.homepage})` : "",
+          repo.homepage ? `- [🌐 Demo](${repo.homepage})` : "",
         )
 
         // Só escrever se o conteúdo for diferente
