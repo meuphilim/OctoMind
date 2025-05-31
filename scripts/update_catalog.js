@@ -382,8 +382,9 @@ async function generateDocumentation(repos) {
 }
 
 // Executar o script
-//main()
+main()
 
+// Mantenha a função updateCatalog para compatibilidade:
 async function updateCatalog() {
   await main()
   return null
