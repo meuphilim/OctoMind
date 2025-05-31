@@ -1,6 +1,6 @@
 /**
  * OctoMind - Script de Atualização de Catálogo
- * Versão: 2.1.0
+ * Versão: 2.2.0 (Aprimoramentos de Portfólio)
  */
 
 import fs from "fs/promises"
@@ -13,7 +13,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT_DIR = path.join(__dirname, "..")
 const README_PATH = path.join(ROOT_DIR, "README.md")
 const DOCS_DIR = path.join(ROOT_DIR, "docs")
-const MODEL_PATH = path.join(DOCS_DIR, "modelo.md")
+const MODEL_PATH = path.join(DOCS_DIR, "modelo.md") // Certifique-se que este arquivo existe e contém o novo template
 const CACHE_DIR = path.join(ROOT_DIR, ".cache")
 const CACHE_FILE = path.join(CACHE_DIR, "repo-cache.json")
 
@@ -26,7 +26,7 @@ const CURRENT_REPO_NAME = process.env.GITHUB_REPOSITORY?.split("/")[1] || "OctoM
 // Headers para requisições à API do GitHub
 const headers = {
   Accept: "application/vnd.github.v3+json",
-  "User-Agent": "OctoMind-Portfolio-Bot/2.1.0",
+  "User-Agent": "OctoMind-Portfolio-Bot/2.2.0",
   ...(GITHUB_TOKEN && { Authorization: `Bearer ${GITHUB_TOKEN}` }),
 }
 
@@ -229,11 +229,11 @@ async function updateReadme(repos) {
     let readmeContent = await fs.readFile(README_PATH, "utf8")
     const oldContent = readmeContent
 
-    const tableContent = generateRepositoryTable(repos)
+    const projectsSection = generateProjectsSection(repos) // Renomeado para refletir o novo formato
 
     readmeContent = readmeContent.replace(
-      /<!-- OCTOMIND_PROJECTS_START -->[\s\S]*?<!-- OCTOMIND_PROJECTS_END -->/,
-      `<!-- OCTOMIND_PROJECTS_START -->\n${tableContent}\n<!-- OCTOMIND_PROJECTS_END -->`,
+      /[\s\S]*?/,
+      `\n${projectsSection}\n`,
     )
 
     const repoCount = repos.length
@@ -258,135 +258,118 @@ async function updateReadme(repos) {
 }
 
 /**
- * Gera a seção de repositórios em formato de cards
+ * Gera a seção de projetos em formato de cards para o README.md
  */
-function generateRepositoryTable(repos) {
+function generateProjectsSection(repos) {
   if (repos.length === 0) {
     return `
 <div align="center">
   <h3>🔍 Nenhum projeto encontrado</h3>
   <p><em>Os projetos aparecerão aqui assim que forem detectados pelo script.</em></p>
-</div>`
+</div>`;
   }
 
   // Agrupar repositórios por linguagem para melhor organização
   const reposByLanguage = repos.reduce((acc, repo) => {
-    const lang = repo.language || "Outros"
-    if (!acc[lang]) acc[lang] = []
-    acc[lang].push(repo)
-    return acc
-  }, {})
+    const lang = repo.language || "Outros";
+    if (!acc[lang]) acc[lang] = [];
+    acc[lang].push(repo);
+    return acc;
+  }, {});
 
   let content = `
 <div align="center">
-  <h3>📊 Estatísticas dos Projetos</h3>
+  <h2>🚀 Meus Projetos</h2>
+  <p>Explore alguns dos meus trabalhos e contribuições.</p>
   <p>
     <img src="https://img.shields.io/badge/Total_de_Projetos-${repos.length}-blue?style=for-the-badge" alt="Total de Projetos">
     <img src="https://img.shields.io/badge/Linguagens-${Object.keys(reposByLanguage).length}-orange?style=for-the-badge" alt="Linguagens">
   </p>
 </div>
 
----
-`
+<div class="portfolio-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; margin-top: 30px;">
+`;
 
   // Gerar cards para cada repositório
-  content += `
-<div align="center">
-  <h3>🗂️ Projetos por Categoria</h3>
-</div>
-
-<table>
-  <tr>
-    <th width="50%">📋 Projeto</th>
-    <th width="25%">🛠️ Tecnologia</th>
-    <th width="25%">📅 Atualização</th>
-  </tr>`
-
   for (const repo of repos) {
-    const name = sanitizeMarkdown(repo.name)
-    const description = repo.description ? sanitizeMarkdown(repo.description) : "*Sem descrição disponível*"
-    const lang = repo.language || "N/A"
-    const languageDisplay = `${languageEmojis[lang] || languageEmojis.default} ${sanitizeMarkdown(lang)}`
+    const name = sanitizeMarkdown(repo.name);
+    const description = repo.description ? sanitizeMarkdown(repo.description) : "Sem descrição disponível.";
+    const lang = repo.language || "N/A";
+    const languageDisplay = `${languageEmojis[lang] || languageEmojis.default} ${sanitizeMarkdown(lang)}`;
+    const updatedAt = new Date(repo.updated_at).toLocaleDateString("pt-BR");
+    const docFileName = `${slugify(name, { lower: true, strict: true })}.md`;
 
-    // Formatar data no formato brasileiro
-    const updatedAt = new Date(repo.updated_at).toLocaleDateString("pt-BR")
-
-    // Criar slug para documentação
-    const docFileName = `${slugify(name, { lower: true, strict: true })}.md`
-
-    // Gerar badges para tópicos
+    // Gerar badges para tópicos com um pouco de estilo inline
     const topicsBadges =
       repo.topics && repo.topics.length > 0
         ? repo.topics
             .map(
               (topic) =>
-                `<img src="https://img.shields.io/badge/${encodeURIComponent(topic)}-gray?style=flat-square" alt="${topic}">`,
+                `<span style="display: inline-block; background-color: #e2e6ea; color: #495057; padding: 4px 8px; border-radius: 4px; font-size: 0.8em; margin-right: 5px; margin-bottom: 5px;">${topic}</span>`,
             )
             .join(" ")
-        : ""
+        : "";
 
-    // Links adicionais
-    const demoLink = repo.homepage ? `<br><a href="${repo.homepage}">🌐 Demo</a>` : ""
+    // Links adicionais como botões com estilo inline
+    const demoLink = repo.homepage
+      ? `<a href="${repo.homepage}" style="display: inline-block; background-color: #28a745; color: white; padding: 8px 15px; border-radius: 5px; text-decoration: none; margin-left: 10px; font-weight: bold;">🌐 Demo</a>`
+      : "";
 
     content += `
-  <tr>
-    <td>
-      <div align="left">
-        <h4><a href="${repo.html_url}">${name}</a> <a href="./docs/${docFileName}">📄</a></h4>
-        <p><em>${description}</em></p>
-        ${topicsBadges ? `<p>${topicsBadges}</p>` : ""}
+  <div class="project-card" style="border: 1px solid #ddd; border-radius: 8px; padding: 20px; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s ease-in-out; background-color: #fff;">
+    <div style="flex-grow: 1;">
+      <h3 style="margin-top: 0; margin-bottom: 10px;"><a href="${repo.html_url}" style="text-decoration: none; color: #007bff;">${name}</a> <a href="./docs/${docFileName}" style="text-decoration: none; color: #6c757d; font-size: 0.9em; margin-left: 5px;">📄 Docs</a></h3>
+      <p style="font-size: 0.9em; color: #555; margin-bottom: 15px;">${description}</p>
+      ${topicsBadges ? `<div style="margin-bottom: 15px;">${topicsBadges}</div>` : ""}
+    </div>
+    <div style="border-top: 1px solid #eee; padding-top: 15px; margin-top: 15px;">
+      <p style="font-weight: bold; color: #333; margin-bottom: 5px;">Tecnologia: ${languageDisplay}</p>
+      <p style="font-size: 0.85em; color: #777; margin-bottom: 15px;">Última Atualização: <code>${updatedAt}</code></p>
+      <div class="card-actions">
+        <a href="${repo.html_url}" style="display: inline-block; background-color: #007bff; color: white; padding: 8px 15px; border-radius: 5px; text-decoration: none; font-weight: bold;">View Code</a>
         ${demoLink}
       </div>
-    </td>
-    <td align="center">
-      <strong>${languageDisplay}</strong>
-    </td>
-    <td align="center">
-      <code>${updatedAt}</code>
-    </td>
-  </tr>`
+    </div>
+  </div>`;
   }
 
   content += `
-</table>
-
----
-
-<div align="center">
-  <h3>📈 Linguagens Mais Utilizadas</h3>
 </div>
 
-<div align="center">
-`
+<div align="center" style="margin-top: 50px; padding-top: 30px; border-top: 1px solid #eee;">
+  <h3>📈 Linguagens Mais Utilizadas</h3>
+  <p>Um panorama das principais tecnologias usadas em meus projetos.</p>
+</div>
+
+<div align="center" style="margin-top: 20px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
+`;
 
   // Gerar estatísticas de linguagens
   const languageStats = Object.entries(reposByLanguage)
     .sort(([, a], [, b]) => b.length - a.length)
-    .slice(0, 5) // Top 5 linguagens
+    .slice(0, 5); // Top 5 linguagens
 
   for (const [language, repoList] of languageStats) {
-    const emoji = languageEmojis[language] || languageEmojis.default
-    const percentage = Math.round((repoList.length / repos.length) * 100)
-    content += `  <img src="https://img.shields.io/badge/${encodeURIComponent(language)}-${repoList.length}_projetos_(${percentage}%25)-${getLanguageColor(language)}?style=for-the-badge&logo=${getLanguageLogo(language)}" alt="${language}">
-`
+    const emoji = languageEmojis[language] || languageEmojis.default;
+    const percentage = Math.round((repoList.length / repos.length) * 100);
+    content += `  <img src="https://img.shields.io/badge/${encodeURIComponent(language)}-${repoList.length}_projetos_(${percentage}%25)-${getLanguageColor(language)}?style=for-the-badge&logo=${getLanguageLogo(language)}" alt="${language}" style="margin: 5px;">
+`;
   }
 
   content += `
 </div>
 
----
-
-<div align="center">
+<div align="center" style="margin-top: 50px; padding-top: 30px; border-top: 1px solid #eee;">
   <h3>🔗 Links Rápidos</h3>
   <p>
-    <a href="#sobre-mim">👋 Sobre Mim</a> •
-    <a href="#como-funciona">⚙️ Como Funciona</a> •
-    <a href="#tecnologias">🛠️ Tecnologias</a> •
-    <a href="#contato">📬 Contato</a>
+    <a href="#sobre-mim" style="text-decoration: none; color: #007bff; margin: 0 15px; font-weight: bold;">👋 Sobre Mim</a> •
+    <a href="#como-funciona" style="text-decoration: none; color: #007bff; margin: 0 15px; font-weight: bold;">⚙️ Como Funciona</a> •
+    <a href="#tecnologias" style="text-decoration: none; color: #007bff; margin: 0 15px; font-weight: bold;">🛠️ Tecnologias</a> •
+    <a href="#contato" style="text-decoration: none; color: #007bff; margin: 0 15px; font-weight: bold;">📬 Contato</a>
   </p>
-</div>`
+</div>`;
 
-  return content
+  return content;
 }
 
 /**
@@ -464,7 +447,41 @@ async function generateDocumentation(repos) {
   try {
     console.log("📋 Gerando documentação...")
 
-    const modelContent = await fs.readFile(MODEL_PATH, "utf8")
+    let modelContent = "";
+    try {
+        modelContent = await fs.readFile(MODEL_PATH, "utf8");
+    } catch (readError) {
+        console.warn(`⚠️ Aviso: O arquivo de modelo "${MODEL_PATH}" não foi encontrado. A documentação será gerada com um template padrão. Crie este arquivo para personalizar a documentação.`);
+        // Fallback para um template padrão se o modelo não existir
+        modelContent = `
+# {{ PROJECT_NAME }}
+
+## Visão Geral
+
+{{ PROJECT_DESCRIPTION }}
+
+## Tecnologias Utilizadas
+
+- **Linguagem Principal**: {{ PROJECT_LANGUAGE }}
+- **Tópicos**: {{ PROJECT_TOPICS }}
+
+## Links
+
+- [🔗 Repositório no GitHub]({{ PROJECT_URL }})
+{{ PROJECT_DEMO_LINK_PLACEHOLDER }}
+
+---
+
+### Adicione Mais Detalhes
+
+Para deixar esta documentação mais completa, você pode adicionar as seguintes seções manualmente:
+
+- **Funcionalidades Principais**: Liste as características mais importantes do projeto.
+- **Como Executar**: Instruções para configurar e rodar o projeto localmente.
+- **Screenshots/GIFs**: Adicione imagens para mostrar o projeto em ação.
+- **Desafios e Aprendizados**: Descreva os problemas que você enfrentou e o que aprendeu ao desenvolvê-lo.
+        `;
+    }
 
     // Processar repositórios em paralelo para melhor performance
     const results = await Promise.allSettled(
@@ -500,7 +517,7 @@ async function generateDocumentation(repos) {
 
         docContent = docContent.replace(
           /\{\{ PROJECT_DEMO_LINK_PLACEHOLDER \}\}/g,
-          repo.homepage ? `- [🌐 Demo](${repo.homepage})` : "",
+          repo.homepage ? `- [🌐 Demo ao Vivo](${repo.homepage})` : "",
         )
 
         // Só escrever se o conteúdo for diferente
