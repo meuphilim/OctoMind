@@ -382,4 +382,11 @@ async function generateDocumentation(repos) {
 }
 
 // Executar o script
-main()
+//main()
+
+async function updateCatalog() {
+  await main()
+  return null
+}
+
+export default updateCatalog

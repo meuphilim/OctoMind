@@ -29,11 +29,23 @@ fi
 node -e "console.log(typeof fetch !== 'undefined' ? '✅ Fetch nativo disponível' : '❌ Fetch não disponível')"
 
 echo "📦 Instalando dependências..."
-npm install
+npm install --legacy-peer-deps
 
 if [ $? -ne 0 ]; then
-    echo "❌ Falha ao instalar dependências"
-    exit 1
+    echo "❌ Falha ao instalar dependências com --legacy-peer-deps"
+    echo "🔄 Tentando com --force..."
+    npm install --force
+    
+    if [ $? -ne 0 ]; then
+        echo "❌ Falha ao instalar dependências mesmo com --force"
+        echo "🔄 Tentando instalar apenas slugify..."
+        npm install --save slugify --no-package-lock
+        
+        if [ $? -ne 0 ]; then
+            echo "❌ Não foi possível instalar as dependências"
+            exit 1
+        fi
+    fi
 fi
 
 echo "🚀 Executando script de atualização..."
