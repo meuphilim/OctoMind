@@ -232,9 +232,10 @@ async function updateReadme(repos) {
     // Chamar a função que gera o HTML dos cards
     const projectsSectionHtml = generateProjectsSection(repos)
 
+    // Substitui apenas o conteúdo entre as marcações
     readmeContent = readmeContent.replace(
-      /[\s\S]*?/,
-      `\n${projectsSectionHtml}\n`,
+      /<!-- OCTOMIND_PROJECTS_START -->([\s\S]*?)<!-- OCTOMIND_PROJECTS_END -->/g,
+      `<!-- OCTOMIND_PROJECTS_START -->\n${projectsSectionHtml}\n<!-- OCTOMIND_PROJECTS_END -->`
     )
 
     const repoCount = repos.length
