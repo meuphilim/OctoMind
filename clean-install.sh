@@ -29,7 +29,7 @@ echo "✅ Node.js $(node -v) detectado"
 
 # Instalar apenas slugify
 echo "📦 Instalando apenas a dependência slugify..."
-npm install --save slugify --no-package-lock
+npm install --save slugify --no-package-lock --force
 
 if [ $? -ne 0 ]; then
     echo "❌ Falha ao instalar slugify"
