@@ -231,6 +231,23 @@
 
 Olá! Sou **@meuphilim**, um desenvolvedor entusiasta focado em desenvolvimento web e automação. Este portfólio é uma vitrine viva dos meus projetos e contribuições, mantido atualizado dinamicamente pela magia do GitHub Actions.
 
+## 🚀 Meus Projetos
+
+## ⚙️ Como Funciona
+
+Este portfólio **OctoMind** é automatizado através de:
+
+1. **Script Node.js**: Coleta dados dos repositórios via API do GitHub
+2. **GitHub Actions**: Executa o script semanalmente e quando necessário
+3. **GitHub Pages**: Publica o resultado como um site estático
+
+## 🛠️ Tecnologias
+
+- Node.js
+- GitHub Actions
+- GitHub Pages
+- GitHub API
+
 ## Desafios e Aprendizados
 
 * **Principais desafios técnicos enfrentados:**
@@ -254,23 +271,6 @@ Olá! Sou **@meuphilim**, um desenvolvedor entusiasta focado em desenvolvimento 
   * Estabeleci uma rotina de melhorias constantes, tratando feedbacks como bússolas e adaptando a stack de acordo com a maturidade do projeto.
 
 > 💡 **Nota pessoal:** Encarar a criação de soluções locais como oportunidades de inovação é o que mais me motiva. Cada obstáculo vencido é também uma chance de gerar impacto positivo na vida real.
-
-## 🚀 Meus Projetos
-
-## ⚙️ Como Funciona
-
-Este portfólio é automatizado através de:
-
-1. **Script Node.js**: Coleta dados dos repositórios via API do GitHub
-2. **GitHub Actions**: Executa o script semanalmente e quando necessário
-3. **GitHub Pages**: Publica o resultado como um site estático
-
-## 🛠️ Tecnologias
-
-- Node.js
-- GitHub Actions
-- GitHub Pages
-- GitHub API
 
 ## 📬 Contato
 
