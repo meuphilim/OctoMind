@@ -1,10 +1,16 @@
 <div align="center">
-  # OctoMind: Portfólio GitHub Dinâmico
-
-[![Status da Atualização](https://img.shields.io/github/actions/workflow/status/meuphilim/OctoMind/update.yml?branch=main&label=Atualização%20Automática&style=for-the-badge)](https://github.com/meuphilim/OctoMind/actions/workflows/update.yml)
-![Repositórios](https://img.shields.io/badge/Repositórios-5-blue?style=for-the-badge)
-![Linguagens](https://img.shields.io/badge/Linguagens-3-orange?style=for-the-badge)
-[![GitHub Profile](https://img.shields.io/badge/GitHub-meuphilim-lightgrey?style=for-the-badge&logo=github)](https://github.com/meuphilim)
+  <h2>🚀 OctoMind: Portfólio GitHub Dinâmico</h2>
+  <p>Este portfólio é atualizado automaticamente com meus repositórios mais recentes, graças à magia do GitHub Actions!</p>
+  <p>
+    <a href="https://github.com/meuphilim/OctoMind/actions/workflows/update.yml">
+      <img src="https://img.shields.io/github/actions/workflow/status/meuphilim/OctoMind/update.yml?branch=main&label=Atualização%20Automática&style=for-the-badge" alt="Status da Atualização">
+    </a>
+    <img src="https://img.shields.io/badge/Repositórios-5-blue?style=for-the-badge" alt="Repositórios">
+    <img src="https://img.shields.io/badge/Linguagens-3-orange?style=for-the-badge" alt="Linguagens">
+    <a href="https://github.com/meuphilim">
+      <img src="https://img.shields.io/badge/GitHub-meuphilim-lightgrey?style=for-the-badge&logo=github" alt="GitHub Profile">
+    </a>
+  </p>
 </div>
 
 ## 👋 Sobre Mim
