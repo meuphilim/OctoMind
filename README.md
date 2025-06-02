@@ -9,8 +9,6 @@
 
 Olá! Sou **@meuphilim**, um desenvolvedor entusiasta focado em desenvolvimento web e automação. Este portfólio é uma vitrine viva dos meus projetos e contribuições, mantido atualizado dinamicamente pela magia do GitHub Actions.
 
-## 🚀 Meus Projetos
-
 <!-- OCTOMIND_PROJECTS_START -->
 
 <div align="center">
